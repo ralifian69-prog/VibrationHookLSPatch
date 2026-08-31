@@ -1,6 +1,5 @@
 package com.ralifian69.vibrationhook;
 
-import android.os.VibrationEffect;
 import android.util.Log;
 
 import java.lang.reflect.Method;
@@ -23,23 +22,22 @@ public class ModuleMain extends XposedModule {
         Log.i(TAG, "Fishing Planet ditemukan!");
 
         try {
-            Class<?> vibrationEffect =
-                    Class.forName(
-                            "android.os.VibrationEffect",
-                            false,
-                            param.getDefaultClassLoader()
-                    );
+            Class<?> vibrationEffect = Class.forName(
+                    "android.os.VibrationEffect",
+                    false,
+                    param.getDefaultClassLoader()
+            );
 
-            Method createOneShot =
-                    vibrationEffect.getDeclaredMethod(
-                            "createOneShot",
-                            long.class,
-                            int.class
-                    );
+            Method createOneShot = vibrationEffect.getDeclaredMethod(
+                    "createOneShot",
+                    long.class,
+                    int.class
+            );
 
             hook(createOneShot).intercept(chain -> {
-                long duration = (long) chain.getArgs()[0];
-                int amplitude = (int) chain.getArgs()[1];
+
+                long duration = (long) chain.getArg(0);
+                int amplitude = (int) chain.getArg(1);
 
                 Log.i(
                         TAG,
