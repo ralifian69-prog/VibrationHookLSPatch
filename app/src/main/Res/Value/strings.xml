@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+    <string name="app_name">Vibration Hook</string>
+    <string name="app_description">Meneruskan event vibration ke Tasker</string>
+
+</resources>
