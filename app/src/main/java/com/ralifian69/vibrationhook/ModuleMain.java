@@ -1,6 +1,9 @@
 package com.ralifian69.vibrationhook;
 
+import android.os.VibrationEffect;
 import android.util.Log;
+
+import java.lang.reflect.Method;
 
 import io.github.libxposed.api.XposedModule;
 import io.github.libxposed.api.XposedModuleInterface.PackageLoadedParam;
@@ -13,13 +16,46 @@ public class ModuleMain extends XposedModule {
 
     @Override
     public void onPackageLoaded(PackageLoadedParam param) {
-
         if (!TARGET_PACKAGE.equals(param.getPackageName())) {
             return;
         }
 
         Log.i(TAG, "Fishing Planet ditemukan!");
-        Log.i(TAG, "Process: " + param.getProcessName());
-        Log.i(TAG, "ClassLoader: " + param.getDefaultClassLoader());
+
+        try {
+            Class<?> vibrationEffect =
+                    Class.forName(
+                            "android.os.VibrationEffect",
+                            false,
+                            param.getDefaultClassLoader()
+                    );
+
+            Method createOneShot =
+                    vibrationEffect.getDeclaredMethod(
+                            "createOneShot",
+                            long.class,
+                            int.class
+                    );
+
+            hook(createOneShot).intercept(chain -> {
+                long duration = (long) chain.getArgs()[0];
+                int amplitude = (int) chain.getArgs()[1];
+
+                Log.i(
+                        TAG,
+                        "VIBRATION! duration="
+                                + duration
+                                + " amplitude="
+                                + amplitude
+                );
+
+                return chain.proceed();
+            });
+
+            Log.i(TAG, "Hook VibrationEffect berhasil!");
+
+        } catch (Throwable e) {
+            Log.e(TAG, "Gagal hook VibrationEffect", e);
+        }
     }
 }
